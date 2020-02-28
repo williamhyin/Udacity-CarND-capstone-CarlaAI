@@ -26,7 +26,7 @@ class TLClassifier(object):
                 od_graph_def.ParseFromString(serialized_graph)
                 tf.import_graph_def(od_graph_def, name='')
 
-            self.sess = tf.Session(graph=self.detection_graph)
+        self.sess = tf.Session(graph=self.detection_graph)
 
         self.detection_boxes = self.detection_graph.get_tensor_by_name('detection_boxes:0')
         self.image_tensor = self.detection_graph.get_tensor_by_name('image_tensor:0')
