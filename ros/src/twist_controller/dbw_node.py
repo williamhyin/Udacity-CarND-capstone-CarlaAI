@@ -112,7 +112,8 @@ class DBWNode(object):
             #   self.publish(throttle, brake, steer)
 
             if not None in (self.current_vel, self.linear_vel, self.angular_vel):
-                cte = self.get_cte(self.final_waypoints_2d, self.pose)
+                # cte = self.get_cte(self.final_waypoints_2d, self.pose)
+                cte =0
                 self.throttle, self.brake, self.steering = self.controller.control(self.current_vel,
                                                                                    self.dbw_enabled,
                                                                                    self.linear_vel,
@@ -142,39 +143,39 @@ class DBWNode(object):
         self.pose = msg
         pass
 
-    def get_cte(self, final_waypoints_2d, current_pose):
-        if final_waypoints_2d is not None and current_pose is not None:
-            # convert from quaternion to yaw
-            orientation_q = current_pose.pose.orientation
-            _, _, yaw = euler_from_quaternion([orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w])
-
-            # get the x and y of the current pose
-            x = current_pose.pose.position.x
-            y = current_pose.pose.position.y
-            x_transform = []
-            y_transform = []
-            cos_yaw = math.cos(-yaw)
-            sin_yaw = math.sin(-yaw)
-
-            # set the number of points to fit
-            points_to_fit = 10
-            points_to_fit = min(points_to_fit, len(final_waypoints_2d))
-
-            # transform the waypoints to the vehicle frame
-            for i in range(points_to_fit):
-                waypoint_x, waypoint_y = final_waypoints_2d[i]
-                x_d = waypoint_x - x
-                y_d = waypoint_y - y
-                x_transform.append(x_d * cos_yaw - y_d * sin_yaw)
-                y_transform.append(x_d * sin_yaw + y_d * cos_yaw)
-
-            # Fit a 3rd degree polynomial to the waypoints
-            degree = 3
-            coefficients = np.polyfit(x_transform, y_transform, degree)
-
-            return np.polyval(coefficients, 0.0)
-        else:
-            return 0
+    # def get_cte(self, final_waypoints_2d, current_pose):
+    #     if final_waypoints_2d is not None and current_pose is not None:
+    #         # convert from quaternion to yaw
+    #         orientation_q = current_pose.pose.orientation
+    #         _, _, yaw = euler_from_quaternion([orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w])
+    #
+    #         # get the x and y of the current pose
+    #         x = current_pose.pose.position.x
+    #         y = current_pose.pose.position.y
+    #         x_transform = []
+    #         y_transform = []
+    #         cos_yaw = math.cos(-yaw)
+    #         sin_yaw = math.sin(-yaw)
+    #
+    #         # set the number of points to fit
+    #         points_to_fit = 10
+    #         points_to_fit = min(points_to_fit, len(final_waypoints_2d))
+    #
+    #         # transform the waypoints to the vehicle frame
+    #         for i in range(points_to_fit):
+    #             waypoint_x, waypoint_y = final_waypoints_2d[i]
+    #             x_d = waypoint_x - x
+    #             y_d = waypoint_y - y
+    #             x_transform.append(x_d * cos_yaw - y_d * sin_yaw)
+    #             y_transform.append(x_d * sin_yaw + y_d * cos_yaw)
+    #
+    #         # Fit a 3rd degree polynomial to the waypoints
+    #         degree = 3
+    #         coefficients = np.polyfit(x_transform, y_transform, degree)
+    #
+    #         return np.polyval(coefficients, 0.0)
+    #     else:
+    #         return 0
 
     def publish(self, throttle, brake, steer):
         tcmd = ThrottleCmd()

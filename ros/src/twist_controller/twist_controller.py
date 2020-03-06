@@ -21,8 +21,8 @@ class Controller(object):
         self.throttle_controller = PID(kp=0.3, ki=0.1, kd=0., mn=0,
                                        mx=0.30 * (self.vehicle_params.accel_limit))
 
-        self.cte_controller = PID(kp=0.5, ki=0., kd=0.02, mn=-self.vehicle_params.max_steer_angle,
-                                  mx=self.vehicle_params.max_steer_angle)
+        # self.cte_controller = PID(kp=0.5, ki=0., kd=0.02, mn=-self.vehicle_params.max_steer_angle,
+        #                           mx=self.vehicle_params.max_steer_angle)
 
         tau = 0.5  # 1/(2pi*tau) = cutoff frequency
         ts = .02  # sample time
@@ -37,7 +37,7 @@ class Controller(object):
 
         if not dbw_enabled:
             self.throttle_controller.reset()
-            self.cte_controller.reset()
+            # self.cte_controller.reset()
             return 0., 0., 0.
 
         current_vel = self.vel_lpf.filt(current_vel)
@@ -48,10 +48,11 @@ class Controller(object):
         self.last_time = current_time
 
         # steering calculation
-        steering_base = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
-        steering_cte = self.cte_controller.step(cte, sample_time)
-        steering_total = steering_base + steering_cte
-        steering = max(min(self.vehicle_params.max_steer_angle, steering_total), -self.vehicle_params.max_steer_angle)
+        # steering_base = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
+        # steering_cte = self.cte_controller.step(cte, sample_time)
+        # steering_total = steering_base + steering_cte
+        # steering = max(min(self.vehicle_params.max_steer_angle, steering_total), -self.vehicle_params.max_steer_angle)
+        steering = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
 
         # throttle calculation
         vel_error = linear_vel - current_vel
